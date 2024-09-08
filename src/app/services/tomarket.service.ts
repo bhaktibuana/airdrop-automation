@@ -2,20 +2,25 @@ import { Response } from 'express';
 
 import { Service } from '@/libs';
 import { TomarketApi } from '@/app/apis';
-import { AccountInfoQueryDTO } from '@/app/controllers/dto/tomarket.dto';
-import { SettingRepository } from '@/app/repositories';
+import {
+	AccountInfoQueryDTO,
+	FarmingLogsQueryDTO,
+} from '@/app/controllers/dto/tomarket.dto';
+import { SettingRepository, TomarketRepository } from '@/app/repositories';
 import { I_Account } from '@/app/models/interfaces/account.interface';
 import { AppUtil } from '@/shared/utils';
 
 export class TomarketService extends Service {
 	protected tomarketApi: TomarketApi;
 	protected settingRepo: SettingRepository;
+	protected tomarketRepo: TomarketRepository;
 
 	constructor() {
 		super();
 
 		this.tomarketApi = new TomarketApi();
 		this.settingRepo = new SettingRepository();
+		this.tomarketRepo = new TomarketRepository();
 	}
 
 	public async accountInfo(res: Response, payload: AccountInfoQueryDTO) {
@@ -109,6 +114,27 @@ export class TomarketService extends Service {
 		return true;
 	}
 
+	public async farmingLogs(res: Response, payload: FarmingLogsQueryDTO) {
+		try {
+			return await this.tomarketRepo.getSystemLogs(
+				payload.username,
+				payload.status,
+				{
+					current_page: payload.page,
+					per_page: payload.per_page,
+				},
+			);
+		} catch (error) {
+			await this.systemLog(this.farmingLogs.name, error);
+			this.errorResponse(res, error);
+		}
+
+		return {
+			data: [],
+			pagination: {},
+		};
+	}
+
 	private async accountDetail(username: string) {
 		try {
 			const telegramAccount = await this.settingRepo.findOne({
@@ -140,7 +166,7 @@ export class TomarketService extends Service {
 				},
 			};
 		} catch (error) {
-			await this.systemLog(this.accountInfo.name, error);
+			await this.systemLog(this.accountDetail.name, error);
 		}
 
 		return null;

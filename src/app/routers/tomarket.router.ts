@@ -8,5 +8,6 @@ export class TomarketRouter extends RouterLibrary<TomarketController> {
 		super(router, '/tomarket', new TomarketController());
 
 		this.get('/account-info', this.controller.accountInfo);
+		this.get('/farming-logs', this.controller.farmingLogs);
 	}
 }

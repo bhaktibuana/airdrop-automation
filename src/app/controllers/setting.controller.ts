@@ -33,7 +33,7 @@ export class SettingController extends Controller {
 			this.response(
 				res,
 				'Create account success',
-				this.STATUS_CODE.OK,
+				this.STATUS_CODE.CREATED,
 				result,
 			);
 		} catch (error) {
