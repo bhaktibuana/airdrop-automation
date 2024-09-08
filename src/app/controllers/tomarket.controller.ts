@@ -26,7 +26,12 @@ export class TomarketController extends Controller {
 				req,
 			);
 			const result = await this.tomarketSvc.accountInfo(res, reqQuery);
-			this.response(res, 'User data', this.STATUS_CODE.OK, result);
+			this.response(
+				res,
+				'Tomarket account info',
+				this.STATUS_CODE.OK,
+				result,
+			);
 		} catch (error) {
 			await this.systemLog(this.accountInfo.name, error);
 			this.errorResponse(res, error);

@@ -36,4 +36,12 @@ export class SettingRepository {
 			},
 		]);
 	}
+
+	public async update(
+		query: RootQuerySelector<I_Account>,
+		payload: Partial<I_Account>,
+	) {
+		const account = new Account();
+		return await account.findOneAndUpdate(query, payload);
+	}
 }

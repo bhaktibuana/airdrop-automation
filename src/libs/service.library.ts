@@ -20,11 +20,13 @@ export abstract class Service {
 		functionName: string,
 		data: object | unknown = {},
 		status: 'success' | 'failed' = 'failed',
+		slug: string | null = null,
 	): Promise<void> {
 		const systemLog = new SystemLog();
 		systemLog.payload = {
 			class_name: this.constructor.name,
 			function_name: functionName,
+			slug,
 			status,
 			data,
 		};

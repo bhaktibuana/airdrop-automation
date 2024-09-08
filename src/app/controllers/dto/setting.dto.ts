@@ -15,3 +15,15 @@ export class CreateAccountBodyDTO {
 	@IsNotEmpty()
 	token!: string;
 }
+
+export class DeactivateAccountBodyDTO {
+	@IsString()
+	@IsNotEmpty()
+	username!: string;
+}
+
+export class ActivateAccountBodyDTO {
+	@IsString()
+	@IsNotEmpty()
+	username!: string;
+}

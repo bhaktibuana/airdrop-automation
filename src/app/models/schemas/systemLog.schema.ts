@@ -14,6 +14,10 @@ export class SystemLogSchema {
 				type: String,
 				required: true,
 			},
+			slug: {
+				type: String,
+				default: null,
+			},
 			status: {
 				type: String,
 				required: true,

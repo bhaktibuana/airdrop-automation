@@ -96,7 +96,12 @@ export class TomarketService extends Service {
 				account_before: accountInfoBefore,
 				account_after: accountInfoAfter,
 			};
-			await this.systemLog(this.farming.name, logPayload, 'success');
+			await this.systemLog(
+				this.farming.name,
+				logPayload,
+				'success',
+				'tomarket',
+			);
 		} catch (error) {
 			await this.systemLog(this.farming.name, error);
 		}

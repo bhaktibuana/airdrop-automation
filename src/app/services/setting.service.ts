@@ -1,7 +1,10 @@
 import { Response } from 'express';
 
 import { Service } from '@/libs';
-import { CreateAccountBodyDTO } from '@/app/controllers/dto/setting.dto';
+import {
+	CreateAccountBodyDTO,
+	DeactivateAccountBodyDTO,
+} from '@/app/controllers/dto/setting.dto';
 import { I_Account } from '@/app/models/interfaces/account.interface';
 import { SettingRepository } from '@/app/repositories';
 
@@ -26,7 +29,7 @@ export class SettingService extends Service {
 		payload: CreateAccountBodyDTO,
 	): Promise<I_Account | null> {
 		try {
-			const isUsernameExist = await this.checkUsername(payload);
+			const isUsernameExist = await this.checkUsername(payload.username);
 			if (isUsernameExist) {
 				this.errorHandler(400, 'Username already exist');
 			}
@@ -44,17 +47,38 @@ export class SettingService extends Service {
 		return null;
 	}
 
+	public async updateActive(
+		res: Response,
+		username: string,
+		active: boolean,
+	): Promise<I_Account | null> {
+		try {
+			const isUsernameExist = await this.checkUsername(username);
+			if (!isUsernameExist) {
+				this.errorHandler(404, 'Username is not exist');
+			}
+
+			return await this.settingRepo.update(
+				{ username: username },
+				{ active },
+			);
+		} catch (error) {
+			await this.systemLog(this.updateActive.name, error);
+			this.errorResponse(res, error);
+		}
+
+		return null;
+	}
+
 	/**
 	 * Check is username exist
 	 *
 	 * @param payload
 	 * @returns Promise<boolean>
 	 */
-	private async checkUsername(
-		payload: CreateAccountBodyDTO,
-	): Promise<boolean> {
+	private async checkUsername(username: string): Promise<boolean> {
 		const result = await this.settingRepo.findOne({
-			username: payload.username,
+			username: username,
 		});
 		return result ? true : false;
 	}
