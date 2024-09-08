@@ -40,7 +40,10 @@ export abstract class ApiLibrary {
 		return Promise.reject(error);
 	}
 
-	protected async get<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
+	protected async get<T>(
+		url: string,
+		config?: AxiosRequestConfig,
+	): Promise<T> {
 		const response = await this.api.get<T>(url, config);
 		return response.data;
 	}

@@ -56,16 +56,37 @@ export abstract class Controller {
 		await systemLog.save();
 	}
 
+	private async getRequestObject<T>(
+		dtoClass: ClassConstructor<T>,
+		req: Request['body'] | Request['query'] | Request['params'],
+	) {
+		const reqObject = plainToInstance(dtoClass, req);
+		const errors = await validate(reqObject as object);
+
+		if (errors.length > 0)
+			this.errorHandler(400, 'Validation failed', errors);
+
+		return reqObject;
+	}
+
 	protected async getRequestBody<T>(
 		dtoClass: ClassConstructor<T>,
 		req: Request,
 	) {
-		const reqBody = plainToInstance(dtoClass, req.body);
-		const errors = await validate(reqBody as object);
+		return await this.getRequestObject(dtoClass, req.body);
+	}
 
-		if (errors.length > 1)
-			this.errorHandler(400, 'Validation failed', errors);
+	protected async getRequestQuery<T>(
+		dtoClass: ClassConstructor<T>,
+		req: Request,
+	) {
+		return await this.getRequestObject(dtoClass, req.query);
+	}
 
-		return reqBody;
+	protected async getRequestParams<T>(
+		dtoClass: ClassConstructor<T>,
+		req: Request,
+	) {
+		return await this.getRequestObject(dtoClass, req.params);
 	}
 }

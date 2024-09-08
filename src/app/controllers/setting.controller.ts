@@ -14,7 +14,7 @@ export class SettingController extends Controller {
 	}
 
 	/**
-	 * Store Telegram Account
+	 * Store Account
 	 *
 	 * @param req Request
 	 * @param res Response
