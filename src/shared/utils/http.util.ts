@@ -41,7 +41,8 @@ export class HTTP {
 
 	public static errorResponse<T>(res: Response, error: T): void {
 		if (error instanceof AppError) {
-			HTTP.baseErrorResponse(res, error.message, error.statusCode, error.stack);
+			const err = error.errorData ? error.errorData : error.stack;
+			HTTP.baseErrorResponse(res, error.message, error.statusCode, err);
 		} else {
 			const errorMessage = 'Internal Server Error';
 			Console.error(errorMessage, error);

@@ -18,10 +18,6 @@ export class SystemLogSchema {
 				type: String,
 				required: true,
 			},
-			message: {
-				type: String,
-				required: true,
-			},
 			data: {
 				type: Object,
 				required: true,

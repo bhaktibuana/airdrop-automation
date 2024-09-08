@@ -26,7 +26,7 @@ export abstract class ModelLibrary<T extends Document> {
 	}
 
 	public async findById(id: ObjectId): Promise<T | null> {
-		return this.findOne({ _id: id } as RootQuerySelector<T>);
+		return this.findOne({ _id: id });
 	}
 
 	public async softDelete(id: ObjectId): Promise<T | null> {

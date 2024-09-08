@@ -14,7 +14,7 @@ export class DatabaseConfig {
 	public connect() {
 		try {
 			mongoose.connect(this.url, { dbName: this.dbName });
-			Console.log('Successfully connected to the database', '');
+			Console.log('SYSTEM INFO', 'Successfully connected to the database');
 		} catch (error) {
 			Console.error('Error connecting to the database', error);
 			process.exit(1);

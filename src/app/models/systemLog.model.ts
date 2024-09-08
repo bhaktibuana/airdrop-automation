@@ -1,7 +1,7 @@
 import mongoose, { Model } from 'mongoose';
 
 import { ModelLibrary } from '@/libs';
-import { SystemLogSchema } from '@/app/models/schemas/systelLog.schema';
+import { SystemLogSchema } from '@/app/models/schemas/systemLog.schema';
 import {
 	I_SystemLog,
 	I_SystemLogBase,
@@ -12,9 +12,9 @@ export class SystemLog extends ModelLibrary<I_SystemLog> {
 
 	constructor() {
 		super(
-			mongoose.models.SystemLog ||
+			mongoose.models.system_log ||
 				(mongoose.model<I_SystemLog>(
-					'SystemLog',
+					'system_log',
 					SystemLogSchema.getSchema(),
 				) as Model<I_SystemLog>),
 		);
