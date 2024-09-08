@@ -9,11 +9,13 @@ import {
 import { SettingRepository, TomarketRepository } from '@/app/repositories';
 import { I_Account } from '@/app/models/interfaces/account.interface';
 import { AppUtil } from '@/shared/utils';
+import { SettingService } from '@/app/services/setting.service';
 
 export class TomarketService extends Service {
 	protected tomarketApi: TomarketApi;
 	protected settingRepo: SettingRepository;
 	protected tomarketRepo: TomarketRepository;
+	protected settingSvc: SettingService;
 
 	constructor() {
 		super();
@@ -21,6 +23,7 @@ export class TomarketService extends Service {
 		this.tomarketApi = new TomarketApi();
 		this.settingRepo = new SettingRepository();
 		this.tomarketRepo = new TomarketRepository();
+		this.settingSvc = new SettingService();
 	}
 
 	public async accountInfo(res: Response, payload: AccountInfoQueryDTO) {
@@ -133,6 +136,37 @@ export class TomarketService extends Service {
 			data: [],
 			pagination: {},
 		};
+	}
+
+	public async updateActive(
+		res: Response,
+		username: string,
+		active: boolean,
+	): Promise<I_Account | null> {
+		try {
+			const isUsernameExist =
+				await this.settingSvc.checkUsername(username);
+			if (!isUsernameExist) {
+				this.errorHandler(404, 'Username is not exist');
+			}
+
+			if (active) {
+				return await this.settingRepo.addActiveAirdrops(
+					{ username: username },
+					['tomarket'],
+				);
+			} else {
+				return await this.settingRepo.removeActiveAirdrops(
+					{ username: username },
+					['tomarket'],
+				);
+			}
+		} catch (error) {
+			await this.systemLog(this.updateActive.name, error);
+			this.errorResponse(res, error);
+		}
+
+		return null;
 	}
 
 	private async accountDetail(username: string) {

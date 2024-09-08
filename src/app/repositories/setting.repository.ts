@@ -44,4 +44,45 @@ export class SettingRepository {
 		const account = new Account();
 		return await account.findOneAndUpdate(query, payload);
 	}
+
+	public async addActiveAirdrops(
+		query: RootQuerySelector<I_Account>,
+		airdropName: string[],
+	) {
+		const account = new Account();
+		const data = await account.findOne(query);
+		if (!data) return null;
+
+		const activeAirdrops = data.active_airdrops ? data.active_airdrops : [];
+		const payload = [...activeAirdrops, ...airdropName];
+		return await account.findOneAndUpdate(query, {
+			active_airdrops: payload,
+		});
+	}
+
+	public async removeActiveAirdrops(
+		query: RootQuerySelector<I_Account>,
+		airdropNames: string[],
+	) {
+		const account = new Account();
+		const data = await account.findOne(query);
+		if (!data) return null;
+
+		const activeAirdrops = data.active_airdrops ? data.active_airdrops : [];
+		if (activeAirdrops.length <= 0) return data;
+
+		const payload = activeAirdrops.filter(
+			(item) => !airdropNames.includes(item),
+		);
+		return await account.findOneAndUpdate(query, {
+			active_airdrops: payload,
+		});
+	}
+
+	public async resetActiveAirdrops(query: RootQuerySelector<I_Account>) {
+		const account = new Account();
+		return await account.findOneAndUpdate(query, {
+			active_airdrops: [],
+		});
+	}
 }

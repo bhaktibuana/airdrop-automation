@@ -24,6 +24,10 @@ export class AccountSchema {
 				default: true,
 				required: true,
 			},
+			active_airdrops: {
+				type: Array,
+				default: [],
+			},
 			created_at: {
 				type: Date,
 				required: true,

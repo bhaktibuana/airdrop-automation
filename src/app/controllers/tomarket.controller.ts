@@ -3,6 +3,8 @@ import { Request, Response } from 'express';
 import { Controller } from '@/libs';
 import {
 	AccountInfoQueryDTO,
+	ActivateAccountBodyDTO,
+	DeactivateAccountBodyDTO,
 	FarmingLogsQueryDTO,
 } from '@/app/controllers/dto/tomarket.dto';
 import { TomarketService } from '@/app/services';
@@ -62,6 +64,56 @@ export class TomarketController extends Controller {
 			);
 		} catch (error) {
 			await this.systemLog(this.farmingLogs.name, error);
+			this.errorResponse(res, error);
+		} finally {
+			return;
+		}
+	}
+
+	public async activateAccount(req: Request, res: Response): Promise<void> {
+		try {
+			const reqBody = await this.getRequestBody(
+				ActivateAccountBodyDTO,
+				req,
+			);
+			const result = await this.tomarketSvc.updateActive(
+				res,
+				reqBody.username,
+				true,
+			);
+			this.response(
+				res,
+				'Tomarket activated on this account',
+				this.STATUS_CODE.OK,
+				result,
+			);
+		} catch (error) {
+			await this.systemLog(this.activateAccount.name, error);
+			this.errorResponse(res, error);
+		} finally {
+			return;
+		}
+	}
+
+	public async deactivateAccount(req: Request, res: Response): Promise<void> {
+		try {
+			const reqBody = await this.getRequestBody(
+				DeactivateAccountBodyDTO,
+				req,
+			);
+			const result = await this.tomarketSvc.updateActive(
+				res,
+				reqBody.username,
+				false,
+			);
+			this.response(
+				res,
+				'Tomarket deactivated on this account',
+				this.STATUS_CODE.OK,
+				result,
+			);
+		} catch (error) {
+			await this.systemLog(this.deactivateAccount.name, error);
 			this.errorResponse(res, error);
 		} finally {
 			return;

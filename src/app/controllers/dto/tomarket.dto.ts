@@ -23,3 +23,15 @@ export class FarmingLogsQueryDTO {
 	@IsNumber()
 	per_page!: number;
 }
+
+export class ActivateAccountBodyDTO {
+	@IsString()
+	@IsNotEmpty()
+	username!: string;
+}
+
+export class DeactivateAccountBodyDTO {
+	@IsString()
+	@IsNotEmpty()
+	username!: string;
+}

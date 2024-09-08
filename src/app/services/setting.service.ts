@@ -76,7 +76,7 @@ export class SettingService extends Service {
 	 * @param payload
 	 * @returns Promise<boolean>
 	 */
-	private async checkUsername(username: string): Promise<boolean> {
+	public async checkUsername(username: string): Promise<boolean> {
 		const result = await this.settingRepo.findOne({
 			username: username,
 		});

@@ -9,6 +9,7 @@ export interface I_AccountBase {
 	username?: string;
 	token?: string;
 	active?: boolean;
+	active_airdrops?: string[];
 	created_at?: Date;
 	updated_at?: Date;
 	deleted_at?: Date | null;
