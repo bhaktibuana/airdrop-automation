@@ -1,1 +1,1 @@
-# Trailblazers Tracker API
+# Airdrop Automation API

@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+    airdrop-automation-api:
+        build:
+            context: .
+            dockerfile: dockerfile
+        container_name: airdrop-automation-api
+        image: airdrop-automation-api
+        ports:
+            - 3070:3070
+        env_file:
+            - .env.prod
+        networks:
+            - airdrop_automation_api_network
+
+networks:
+    airdrop_automation_api_network:
+        name: airdrop_automation_api_network

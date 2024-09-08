@@ -10,6 +10,7 @@ import { SettingRepository, TomarketRepository } from '@/app/repositories';
 import { I_Account } from '@/app/models/interfaces/account.interface';
 import { AppUtil } from '@/shared/utils';
 import { SettingService } from '@/app/services/setting.service';
+import { Constant } from '@/shared/constants';
 
 export class TomarketService extends Service {
 	protected tomarketApi: TomarketApi;
@@ -108,7 +109,7 @@ export class TomarketService extends Service {
 				this.farming.name,
 				logPayload,
 				'success',
-				'tomarket',
+				Constant.TOMARKET,
 			);
 		} catch (error) {
 			await this.systemLog(this.farming.name, error);
@@ -153,12 +154,12 @@ export class TomarketService extends Service {
 			if (active) {
 				return await this.settingRepo.addActiveAirdrops(
 					{ username: username },
-					['tomarket'],
+					[Constant.TOMARKET],
 				);
 			} else {
 				return await this.settingRepo.removeActiveAirdrops(
 					{ username: username },
-					['tomarket'],
+					[Constant.TOMARKET],
 				);
 			}
 		} catch (error) {
@@ -172,7 +173,7 @@ export class TomarketService extends Service {
 	public async getActiveUsername() {
 		try {
 			const accounts = await this.settingRepo.findByActiveAirdrops([
-				'tomarket',
+				Constant.TOMARKET,
 			]);
 
 			if (accounts.length > 0) {

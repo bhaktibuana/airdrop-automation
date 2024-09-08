@@ -2,6 +2,7 @@ import { PipelineStage } from 'mongoose';
 
 import { SystemLog } from '@/app/models';
 import { I_Pagination } from '@/shared/interfaces';
+import { Constant } from '@/shared/constants';
 
 export class TomarketRepository {
 	public async getSystemLogs(
@@ -18,7 +19,7 @@ export class TomarketRepository {
 
 		const match: PipelineStage = {
 			$match: {
-				slug: 'tomarket',
+				slug: Constant.TOMARKET,
 				status: statusQuery,
 				'data.username': username,
 				deleted_at: null,
