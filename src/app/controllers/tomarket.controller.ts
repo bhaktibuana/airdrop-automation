@@ -119,4 +119,19 @@ export class TomarketController extends Controller {
 			return;
 		}
 	}
+
+	public async getActiveUsername(
+		_req: Request,
+		res: Response,
+	): Promise<void> {
+		try {
+			const result = await this.tomarketSvc.getActiveUsername();
+			this.response(res, 'Active username', this.STATUS_CODE.OK, result);
+		} catch (error) {
+			await this.systemLog(this.getActiveUsername.name, error);
+			this.errorResponse(res, error);
+		} finally {
+			return;
+		}
+	}
 }

@@ -169,6 +169,24 @@ export class TomarketService extends Service {
 		return null;
 	}
 
+	public async getActiveUsername() {
+		try {
+			const accounts = await this.settingRepo.findByActiveAirdrops([
+				'tomarket',
+			]);
+
+			if (accounts.length > 0) {
+				return accounts.map((item) => item.username);
+			} else {
+				return [];
+			}
+		} catch (error) {
+			await this.systemLog(this.getActiveUsername.name, error);
+		}
+
+		return [];
+	}
+
 	private async accountDetail(username: string) {
 		try {
 			const telegramAccount = await this.settingRepo.findOne({

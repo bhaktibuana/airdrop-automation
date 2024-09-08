@@ -85,4 +85,21 @@ export class SettingRepository {
 			active_airdrops: [],
 		});
 	}
+
+	public async findByActiveAirdrops(airdropNames: string[]) {
+		const account = new Account();
+		return await account.getRaw([
+			{
+				$match: {
+					active_airdrops: { $in: airdropNames },
+				},
+			},
+			{
+				$project: {
+					_id: 0,
+					username: 1,
+				},
+			},
+		]);
+	}
 }
