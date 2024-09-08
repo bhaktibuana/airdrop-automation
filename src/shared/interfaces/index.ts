@@ -102,3 +102,67 @@ export interface I_TomarketRankResponse {
 		futureRankName: string;
 	};
 }
+
+export interface I_TomarketFarmClaimResponse {
+	data: {
+		game_id: string;
+		round_id: string;
+		user_id: number;
+		start_at: number;
+		end_at: number;
+		last_claim: number;
+		points: string;
+		finished: boolean;
+		claim_this_time: string;
+	};
+}
+
+export interface I_TomarketFarmStartResponse {
+	data: {
+		game_id: string;
+		round_id: string;
+		user_id: number;
+		start_at: number;
+		end_at: number;
+		last_claim: number;
+		points: string;
+		finished: boolean;
+		claim_this_time: string;
+		need_time: number;
+	};
+}
+
+export interface I_TomarketHiddenStatusResponse {
+	data: [
+		{
+			start: string;
+			end: string;
+			status: number;
+			taskId: number;
+			code: string;
+			score: number;
+			name: string;
+			description: string;
+		},
+	];
+}
+
+export interface I_TomarketHiddenStartResponse {
+	data: string;
+}
+
+export interface I_TomarketGameStartResponse {
+	data: Object;
+}
+
+export interface I_TomarketGameClaimResponse {
+	data: Object;
+}
+
+export interface I_TomarketGameShareResponse {
+	data: Object;
+}
+
+export interface I_TomarketUpgradeRankResponse {
+	data: Object;
+}

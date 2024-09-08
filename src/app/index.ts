@@ -6,15 +6,22 @@ import path from 'path';
 
 import { routers } from '@/app/routers';
 import { DatabaseConfig } from '@/configs';
+import { TomarketScheduler } from '@/app/schedulers';
 
 export class App {
 	private readonly app = express();
+	protected database: DatabaseConfig;
+	protected tomarketScheduler: TomarketScheduler;
 
 	constructor(port: number) {
+		this.database = new DatabaseConfig();
+		this.tomarketScheduler = new TomarketScheduler();
+
 		this.init();
 		this.middlewares();
 		this.routes();
 		this.listenServer(port);
+		this.background();
 	}
 
 	/**
@@ -22,8 +29,7 @@ export class App {
 	 */
 	private init(): void {
 		// connect database
-		const database = new DatabaseConfig();
-		database.connect();
+		this.database.connect();
 	}
 
 	/**
@@ -55,5 +61,12 @@ export class App {
 		this.app.listen(port, () => {
 			console.log('App is running on port', port);
 		});
+	}
+
+	/**
+	 * Execute every running background codes
+	 */
+	private background(): void {
+		this.tomarketScheduler.farming();
 	}
 }

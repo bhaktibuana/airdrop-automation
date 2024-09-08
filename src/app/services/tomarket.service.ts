@@ -5,6 +5,7 @@ import { TomarketApi } from '@/app/apis';
 import { AccountInfoQueryDTO } from '@/app/controllers/dto/tomarket.dto';
 import { SettingRepository } from '@/app/repositories';
 import { I_Account } from '@/app/models/interfaces/account.interface';
+import { AppUtil } from '@/shared/utils';
 
 export class TomarketService extends Service {
 	protected tomarketApi: TomarketApi;
@@ -19,8 +20,94 @@ export class TomarketService extends Service {
 
 	public async accountInfo(res: Response, payload: AccountInfoQueryDTO) {
 		try {
+			return await this.accountDetail(payload.username);
+		} catch (error) {
+			await this.systemLog(this.accountInfo.name, error);
+			this.errorResponse(res, error);
+		}
+
+		return null;
+	}
+
+	public async farming(username: string) {
+		try {
+			const account = await this.settingRepo.findOne({
+				username,
+				active: true,
+			});
+			if (!account) this.errorHandler(404, 'Username not found');
+			if (account?.type !== 'telegram')
+				this.errorHandler(400, 'Not telegram account');
+
+			const loginResult = await this.login(account?.token);
+			if (Object.keys(loginResult?.data as object).length <= 0)
+				this.errorHandler(400, 'Invalid Tomarket account');
+
+			// get current account info
+			const accountInfoBefore = await this.accountDetail(username);
+
+			const accessToken = loginResult?.data.access_token as string;
+
+			const balance = await this.balance(accessToken);
+			const gameId = balance?.data.farming.game_id as string;
+
+			// claim farm points
+			await this.farmClaim(accessToken, gameId);
+			await this.farmStart(accessToken, gameId);
+
+			// claim hidden points
+			const hiddenStatus = await this.hiddenStatus(accessToken);
+			const taskId =
+				hiddenStatus?.data !== undefined
+					? hiddenStatus.data.length > 0
+						? (hiddenStatus?.data[0].taskId as number)
+						: undefined
+					: undefined;
+			if (taskId) {
+				await this.hiddenClaim(accessToken, taskId);
+			}
+
+			// claim game points till tickets == 0
+			let tickets = balance?.data ? balance.data.play_passes : 0;
+			while (tickets > 0) {
+				await this.gameStart(accessToken, gameId);
+				await AppUtil.sleep(38 * 1000);
+				await this.gameClaim(accessToken, gameId);
+				await AppUtil.sleep(2 * 1000);
+				await this.gameShare(accessToken, gameId);
+
+				const newBalance = await this.balance(accessToken);
+				tickets = newBalance?.data ? newBalance.data.play_passes : 0;
+			}
+
+			// upgrade rank if possible
+			const rank = await this.rank(accessToken);
+			const availableStars = rank?.data ? rank.data.unusedStars : 0;
+			if (availableStars > 0) {
+				await this.upgradeRank(accessToken, availableStars);
+			}
+
+			// get account info after process
+			const accountInfoAfter = await this.accountDetail(username);
+
+			// log account info
+			const logPayload = {
+				username,
+				account_before: accountInfoBefore,
+				account_after: accountInfoAfter,
+			};
+			await this.systemLog(this.farming.name, logPayload, 'success');
+		} catch (error) {
+			await this.systemLog(this.farming.name, error);
+		}
+
+		return true;
+	}
+
+	private async accountDetail(username: string) {
+		try {
 			const telegramAccount = await this.settingRepo.findOne({
-				username: payload.username,
+				username,
 			});
 
 			if (!telegramAccount)
@@ -49,13 +136,12 @@ export class TomarketService extends Service {
 			};
 		} catch (error) {
 			await this.systemLog(this.accountInfo.name, error);
-			this.errorResponse(res, error);
 		}
 
 		return null;
 	}
 
-	public async login(token: I_Account['token']) {
+	private async login(token: I_Account['token']) {
 		try {
 			return await this.tomarketApi.login({
 				init_data: token as string,
@@ -69,7 +155,7 @@ export class TomarketService extends Service {
 		}
 	}
 
-	public async balance(accessToken: string) {
+	private async balance(accessToken: string) {
 		try {
 			return await this.tomarketApi.balance(accessToken);
 		} catch (error) {
@@ -78,12 +164,84 @@ export class TomarketService extends Service {
 		}
 	}
 
-	public async rank(accessToken: string) {
+	private async rank(accessToken: string) {
 		try {
 			return await this.tomarketApi.rank(accessToken);
 		} catch (error) {
 			await this.systemLog(this.rank.name, error);
 			this.errorHandler(400, 'Failed get Tomarket rank');
+		}
+	}
+
+	private async farmClaim(accessToken: string, gameId: string) {
+		try {
+			return await this.tomarketApi.farmClaim(accessToken, gameId);
+		} catch (error) {
+			await this.systemLog(this.farmClaim.name, error);
+			this.errorHandler(400, 'Failed farm claim Tomarket');
+		}
+	}
+
+	private async farmStart(accessToken: string, gameId: string) {
+		try {
+			return await this.tomarketApi.farmStart(accessToken, gameId);
+		} catch (error) {
+			await this.systemLog(this.farmStart.name, error);
+			this.errorHandler(400, 'Failed farm start Tomarket');
+		}
+	}
+
+	private async hiddenStatus(accessToken: string) {
+		try {
+			return await this.tomarketApi.hiddenStatus(accessToken);
+		} catch (error) {
+			await this.systemLog(this.hiddenStatus.name, error);
+			this.errorHandler(400, 'Failed hidden status Tomarket');
+		}
+	}
+
+	private async hiddenClaim(accessToken: string, taskId: number) {
+		try {
+			return await this.tomarketApi.hiddenClaim(accessToken, taskId);
+		} catch (error) {
+			await this.systemLog(this.hiddenClaim.name, error);
+			this.errorHandler(400, 'Failed hidden claim Tomarket');
+		}
+	}
+
+	private async gameStart(accessToken: string, gameId: string) {
+		try {
+			return await this.tomarketApi.gameStart(accessToken, gameId);
+		} catch (error) {
+			await this.systemLog(this.gameStart.name, error);
+			this.errorHandler(400, 'Failed game start Tomarket');
+		}
+	}
+
+	private async gameClaim(accessToken: string, gameId: string) {
+		try {
+			return await this.tomarketApi.gameClaim(accessToken, gameId);
+		} catch (error) {
+			await this.systemLog(this.gameClaim.name, error);
+			this.errorHandler(400, 'Failed game claim Tomarket');
+		}
+	}
+
+	private async gameShare(accessToken: string, gameId: string) {
+		try {
+			return await this.tomarketApi.gameShare(accessToken, gameId);
+		} catch (error) {
+			await this.systemLog(this.gameShare.name, error);
+			this.errorHandler(400, 'Failed game share Tomarket');
+		}
+	}
+
+	private async upgradeRank(accessToken: string, stars: number) {
+		try {
+			return await this.tomarketApi.upgradeRank(accessToken, stars);
+		} catch (error) {
+			await this.systemLog(this.upgradeRank.name, error);
+			this.errorHandler(400, 'Failed upgrade rank Tomarket');
 		}
 	}
 }
