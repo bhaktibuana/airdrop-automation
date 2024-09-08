@@ -35,7 +35,7 @@ jobs:
                       echo "NODE_ENV=production" >> .env.prod
                       echo "DOCKER_ENVIRONMENT=true" > .env.prod
                       echo "PORT=${{ secrets.PROD_PORT }}" >> .env.prod
-                      echo "DATABASE_URL=${{ secrets.PROD_DB_URL }}" >> .env.prod
+                      echo "DATABASE_URL=${{ secrets.PROD_DATABASE_URL }}" >> .env.prod
                       echo "DATABASE_NAME=${{ secrets.PROD_DATABASE_NAME }}" >> .env.prod
                       echo "BASE_URL=${{ secrets.PROD_BASE_URL }}" >> .env.prod
                       echo "TOMARKET_API=${{ secrets.PROD_TOMARKET_API }}" >> .env.prod
