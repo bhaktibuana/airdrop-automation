@@ -10,10 +10,10 @@ export class TomarketScheduler {
 	}
 
 	/**
-	 * Farming Tomarket every 3 hours 10 minutes
+	 * Farming Tomarket every 30 minutes
 	 */
 	public farming() {
-		cron.schedule('10 */3 * * *', async () => {
+		cron.schedule('*/30 * * * *', async () => {
 			const usernames = await this.tomarketSvc.getActiveUsername();
 			usernames.forEach((username) => {
 				this.tomarketSvc.farming(username as string);
