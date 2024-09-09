@@ -11,6 +11,6 @@ RUN npm install
 COPY . .
 
 # compile app to binary file
-RUN npm run build:dev
+RUN npm run build:prod
 
 CMD ["npm", "start"]
