@@ -58,11 +58,11 @@ export class TomarketService extends Service {
 			const accessToken = loginResult?.data.access_token as string;
 
 			const balance = await this.balance(accessToken);
-			const gameId = balance?.data.farming.game_id as string;
+			const farmGameId = balance?.data.farming.game_id as string;
 
 			// claim farm points
-			await this.farmClaim(accessToken, gameId);
-			await this.farmStart(accessToken, gameId);
+			await this.farmClaim(accessToken, farmGameId);
+			await this.farmStart(accessToken, farmGameId);
 
 			// claim hidden points
 			const hiddenStatus = await this.hiddenStatus(accessToken);
@@ -79,17 +79,18 @@ export class TomarketService extends Service {
 			// claim game points till tickets == 0
 			let tickets = balance?.data ? balance.data.play_passes : 0;
 			while (tickets > 0) {
-				await this.gameStart(accessToken, gameId);
+				await this.gameStart(accessToken, Constant.TOMARKET_GAME_ID);
 				await AppUtil.sleep(38 * 1000);
-				await this.gameClaim(accessToken, gameId);
+				await this.gameClaim(accessToken, Constant.TOMARKET_GAME_ID);
 				await AppUtil.sleep(2 * 1000);
-				await this.gameShare(accessToken, gameId);
+				await this.gameShare(accessToken, Constant.TOMARKET_GAME_ID);
 
 				const newBalance = await this.balance(accessToken);
 				tickets = newBalance?.data ? newBalance.data.play_passes : 0;
 			}
 
 			// upgrade rank if possible
+			await AppUtil.sleep(10 * 1000);
 			const rank = await this.rank(accessToken);
 			const availableStars = rank?.data ? rank.data.unusedStars : 0;
 			if (availableStars > 0) {
