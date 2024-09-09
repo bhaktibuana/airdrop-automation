@@ -1,4 +1,5 @@
 import { Response } from 'express';
+import { RootQuerySelector } from 'mongoose';
 
 import { Service } from '@/libs';
 import {
@@ -59,7 +60,7 @@ export class SettingService extends Service {
 			}
 
 			return await this.settingRepo.update(
-				{ username: username },
+				{ username: username } as RootQuerySelector<I_Account>,
 				{ active },
 			);
 		} catch (error) {
@@ -79,7 +80,7 @@ export class SettingService extends Service {
 	public async checkUsername(username: string): Promise<boolean> {
 		const result = await this.settingRepo.findOne({
 			username: username,
-		});
+		} as RootQuerySelector<I_Account>);
 		return result ? true : false;
 	}
 }

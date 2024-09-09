@@ -1,4 +1,5 @@
 import { Response } from 'express';
+import { RootQuerySelector } from 'mongoose';
 
 import { Service } from '@/libs';
 import { TomarketApi } from '@/app/apis';
@@ -43,7 +44,7 @@ export class TomarketService extends Service {
 			const account = await this.settingRepo.findOne({
 				username,
 				active: true,
-			});
+			} as RootQuerySelector<I_Account>);
 			if (!account) this.errorHandler(404, 'Username not found');
 			if (account?.type !== 'telegram')
 				this.errorHandler(400, 'Not telegram account');
@@ -154,12 +155,12 @@ export class TomarketService extends Service {
 
 			if (active) {
 				return await this.settingRepo.addActiveAirdrops(
-					{ username: username },
+					{ username: username } as RootQuerySelector<I_Account>,
 					[Constant.TOMARKET],
 				);
 			} else {
 				return await this.settingRepo.removeActiveAirdrops(
-					{ username: username },
+					{ username: username } as RootQuerySelector<I_Account>,
 					[Constant.TOMARKET],
 				);
 			}
@@ -193,7 +194,7 @@ export class TomarketService extends Service {
 		try {
 			const telegramAccount = await this.settingRepo.findOne({
 				username,
-			});
+			} as RootQuerySelector<I_Account>);
 
 			if (!telegramAccount)
 				this.errorHandler(404, 'Username does not exist');
